@@ -274,13 +274,17 @@ class LCD:
         if not isinstance(char_map, list) or len(char_map) != 8:
             raise TypeError("Char map must be a list of 8 integers.")
 
+        # Ensure pattern values are within the valid range (0-31)
         for byte in char_map:
             if not isinstance(byte, int) or not (0 <= byte <= 31):
                 raise ValueError("Char map values must be integers between 0 and 31.")
 
+        # Set the CGRAM address to the specified location
         self.command(0x40 + (location << 3))
+        
+        # Send each byte of the pattern as raw data (not a character)
         for byte in char_map:
-            self.write_char(chr(byte))
+            self._send_byte(byte, 1)
 
     def display_shift(self, direction):
         """Shifts the entire display content without changing the DDRAM address.
@@ -293,3 +297,4 @@ class LCD:
             self.command(0x1C)
         else:
             raise ValueError("Direction must be 'left' or 'right'.")
+
